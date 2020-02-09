@@ -102,8 +102,6 @@ Total Kilometers
 
 page = page.replace('\n', '')
 
-from IPython.display import HTML
-HTML(page)
 o = open('./index.html', 'w')
 o.write(page)
 o.close()
