@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 import urllib
 import urllib.request
+import html.parser
 import requests
+from requests.exceptions import HTTPError
+from socket import error as SocketError
 from http.cookiejar import CookieJar
 import re
 from bs4 import BeautifulSoup as bs
@@ -12,6 +15,7 @@ from matplotlib import pyplot
 import json
 import base64
 from io import BytesIO
+from urllib.parse import quote 
 
 TOTAL = 0
 DISTANCE = 5
@@ -50,10 +54,18 @@ df['d_place'] = df.apply(lambda x: x['place'][::-1], axis = 1)
 for place in df['place']:
     if ',' in place:
         place = place.split(',')[0]
-    q = 'https://data.gov.il/api/action/datastore_search?resource_id=a5e7080d-3c37-49c2-8cd0-cb2724809216&q=' + place
-    res = requests.get(q)
+    q = 'https://data.gov.il/api/action/datastore_search?resource_id=a5e7080d-3c37-49c2-8cd0-cb2724809216&q=' + quote(place)
+    req=urllib.request.Request(q, None, {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36','Accept-Encoding': 'gzip, deflate','Accept-Language': 'he-IL,he;q=0.9,en-US;q=0.8,en;q=0.7','Connection': 'keep-alive'})
+    cj = CookieJar()
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+    response = opener.open(req)
+    req=urllib.request.Request(q, None)
+    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+    response = opener.open(req)
+    res = response.read().decode('utf-8')
+    response.close()
     try:
-        pop = json.loads(res.content)['result']['records'][0]['סהכ']
+        pop = json.loads(res)['result']['records'][0]['סהכ']
         TOTAL += pop
     except:
         continue
