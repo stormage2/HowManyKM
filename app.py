@@ -3,8 +3,6 @@
 import urllib
 import urllib.request
 import html.parser
-import requests
-from requests.exceptions import HTTPError
 from socket import error as SocketError
 from http.cookiejar import CookieJar
 import re
